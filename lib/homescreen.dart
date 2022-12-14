@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
         body:  TabBarView(
           children: [
             Weather(title: 'Weather'),
-            Map(),
+            MapScreen(),
             Profile(title: 'Profile'),
 
           ],

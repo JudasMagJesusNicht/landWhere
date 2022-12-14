@@ -3,14 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class Map extends StatefulWidget {
-  const Map({Key? key}) : super(key: key);
+import '../API/locationService.dart';
+
+class MapScreen extends StatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
 
   @override
-  State<Map> createState() => MapSampleState();
+  State<MapScreen> createState() => MapSampleState();
 }
 
-class MapSampleState extends State<Map> {
+class MapSampleState extends State<MapScreen> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
@@ -36,9 +38,13 @@ class MapSampleState extends State<Map> {
             children: [
               Expanded(child: TextFormField(
                 controller: _searchController,
+                textCapitalization: TextCapitalization.words,
               )),
               IconButton(
-                onPressed: (){},
+                onPressed: () async {
+                  var place = await LocationService().getPlace(_searchController.text);
+                  _goToPlace(place);
+                },
                 icon: Icon(Icons.search),
               ),
             ],
@@ -55,5 +61,15 @@ class MapSampleState extends State<Map> {
         ],
       ),
     );
+  }
+
+  Future<void> _goToPlace(Map<String, dynamic> place) async {
+    final double lat = place['geometry']['location']['lat'];
+    final double lng = place['geometry']['location']['lng'];
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: LatLng(lat, lng), zoom: 12),
+    ));
   }
 }
