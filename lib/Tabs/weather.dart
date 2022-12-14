@@ -6,8 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-import '../API/data_service.dart';
-import '../API/weather_parse.dart';
+
+
 
 class Weather extends StatefulWidget {
   const Weather({Key? key, required title}) : super(key: key);
@@ -19,10 +19,9 @@ class Weather extends StatefulWidget {
 class _WeatherState extends State<Weather> {
   final String title = 'Weather';
 
-  //final _dataService = DataService();
   final _cityTextController = TextEditingController();
 
-  bool locationFound = false;
+
 
   var cityName;
   var lat;
@@ -33,14 +32,8 @@ class _WeatherState extends State<Weather> {
   var humidity;
   var windSpeed;
 
-  var _response;
 
-  var _latitude = "";
-  var _longitude = "";
-  var _altitude = "";
-  var _adress = "";
-
-  Future getWeather(String cityName) async {
+  Future getWeatherByCity(String cityName) async {
     final queryParameters = {
       'q': cityName,
       'appid': '54a4320f0228f237495a6df9e9d1cac1',
@@ -60,18 +53,28 @@ class _WeatherState extends State<Weather> {
     });
   }
 
-  Future<void> _updatePosition() async {
-    Position position = await _determinePosition();
-    List pm =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    setState(() {
-      _latitude = position.latitude.toString();
-      _longitude = position.longitude.toString();
-      _altitude = position.altitude.toString();
+  Future getWeatherByCoordinates(double lat, double lon) async {
+    final queryParameters = {
+      'lat': lat,
+      'lon': lon,
+      'appid': '54a4320f0228f237495a6df9e9d1cac1',
+      'units': 'metric',
+    };
+    final uri = Uri.https(
+        'api.openweathermap.org', '/data/2.5/weather', queryParameters);
 
-      _adress = pm[0].toString();
+    http.Response response = await http.get(uri);
+    var results = jsonDecode(response.body);
+    setState(() {
+      this.temp = results['main']['temp'];
+      this.description = results['weather'][0]['description'];
+      this.currently = results['weather'][0]['main'];
+      this.humidity = results['main']['humidity'];
+      this.windSpeed = results['wind']['speed'];
     });
   }
+
+
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -102,10 +105,6 @@ class _WeatherState extends State<Weather> {
   @override
   void initState() {
     super.initState();
-    this._updatePosition();
-    lat = _latitude;
-    lon = _longitude;
-    this.getWeather(_adress);
   }
 
   @override
@@ -140,17 +139,28 @@ class _WeatherState extends State<Weather> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    Container(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          getWeather(_cityTextController.text);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepOrangeAccent,
-                        ),
-                        child: const Icon(Icons.search),
+                    ElevatedButton(
+                      onPressed: () {
+                        getWeatherByCity(_cityTextController.text);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrangeAccent,
                       ),
-                    )
+                      child: const Icon(Icons.search),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        _determinePosition().then((value){
+                          lat ='$value.latitude';
+                          lon ='$value.longitude';
+                        });
+                        getWeatherByCoordinates(lat,lon);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrangeAccent,
+                      ),
+                      child: const Icon(Icons.location_searching),
+                    ),
                   ],
                 ),
                 Container(
@@ -162,7 +172,7 @@ class _WeatherState extends State<Weather> {
                   ),
                 ),
                 Text(
-                  description != null ? description.toString() : 'Loading',
+                  currently != null ? currently.toString() : 'Loading',
                   style: GoogleFonts.rubikMonoOne(
                       color: Colors.black, fontSize: 15),
                 ),
