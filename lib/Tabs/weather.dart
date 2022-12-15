@@ -33,46 +33,6 @@ class _WeatherState extends State<Weather> {
   var windSpeed;
 
 
-  Future getWeatherByCity(String cityName) async {
-    final queryParameters = {
-      'q': cityName,
-      'appid': '54a4320f0228f237495a6df9e9d1cac1',
-      'units': 'metric',
-    };
-    final uri = Uri.https(
-        'api.openweathermap.org', '/data/2.5/weather', queryParameters);
-
-    http.Response response = await http.get(uri);
-    var results = jsonDecode(response.body);
-    setState(() {
-      this.temp = results['main']['temp'];
-      this.description = results['weather'][0]['description'];
-      this.currently = results['weather'][0]['main'];
-      this.humidity = results['main']['humidity'];
-      this.windSpeed = results['wind']['speed'];
-    });
-  }
-
-  Future getWeatherByCoordinates(double lat, double lon) async {
-    final queryParameters = {
-      'lat': lat,
-      'lon': lon,
-      'appid': '54a4320f0228f237495a6df9e9d1cac1',
-      'units': 'metric',
-    };
-    final uri = Uri.https(
-        'api.openweathermap.org', '/data/2.5/weather', queryParameters);
-
-    http.Response response = await http.get(uri);
-    var results = jsonDecode(response.body);
-    setState(() {
-      this.temp = results['main']['temp'];
-      this.description = results['weather'][0]['description'];
-      this.currently = results['weather'][0]['main'];
-      this.humidity = results['main']['humidity'];
-      this.windSpeed = results['wind']['speed'];
-    });
-  }
 
 
 
@@ -128,7 +88,7 @@ class _WeatherState extends State<Weather> {
                         controller: _cityTextController,
                         decoration: InputDecoration(
                             hintText: 'Gib deinen Ort ein:',
-                            hintStyle: GoogleFonts.roboto(color: Colors.black54),
+                            hintStyle: GoogleFonts.roboto(color: Colors.black54,fontWeight: FontWeight.w600),
                             border: OutlineInputBorder(),
                             suffixIcon: IconButton(
                               onPressed: () {
@@ -234,10 +194,45 @@ class _WeatherState extends State<Weather> {
     );
   }
 
-// void _search() async {
-//   final response = await _dataService.getWeather(lat, lon);
-//   setState(() => _response = response);
-//   print(response.cityName);
-//   print(response.tempInfo.temperature);
-// }
+  Future getWeatherByCity(String cityName) async {
+    final queryParameters = {
+      'q': cityName,
+      'appid': '54a4320f0228f237495a6df9e9d1cac1',
+      'units': 'metric',
+    };
+    final uri = Uri.https(
+        'api.openweathermap.org', '/data/2.5/weather', queryParameters);
+
+    http.Response response = await http.get(uri);
+    var results = jsonDecode(response.body);
+    setState(() {
+      this.temp = results['main']['temp'];
+      this.description = results['weather'][0]['description'];
+      this.currently = results['weather'][0]['main'];
+      this.humidity = results['main']['humidity'];
+      this.windSpeed = results['wind']['speed'];
+    });
+  }
+
+  Future getWeatherByCoordinates(double lat, double lon) async {
+    final queryParameters = {
+      'lat': lat,
+      'lon': lon,
+      'appid': '54a4320f0228f237495a6df9e9d1cac1',
+      'units': 'metric',
+    };
+    final uri = Uri.https(
+        'api.openweathermap.org', '/data/2.5/weather', queryParameters);
+
+    http.Response response = await http.get(uri);
+    var results = jsonDecode(response.body);
+    setState(() {
+      this.temp = results['main']['temp'];
+      this.description = results['weather'][0]['description'];
+      this.currently = results['weather'][0]['main'];
+      this.humidity = results['main']['humidity'];
+      this.windSpeed = results['wind']['speed'];
+    });
+  }
+
 }

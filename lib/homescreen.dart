@@ -20,12 +20,13 @@ class HomeScreen extends StatelessWidget {
               image: AssetImage('./assets/landwhereText.png'),
               fit: BoxFit.scaleDown,
           ),
-          bottom: const TabBar(
+          bottom:  TabBar(
             tabs: [
               Tab(icon: Icon(Icons.sunny_snowing)),
               Tab(icon: Icon(Icons.map_outlined)),
               Tab(icon: Icon(Icons.person)),
             ],
+            isScrollable: false,
           ),
 
         ),
@@ -36,6 +37,7 @@ class HomeScreen extends StatelessWidget {
             Profile(title: 'Profile'),
 
           ],
+          physics: NeverScrollableScrollPhysics(),
         ),
       ),
     );

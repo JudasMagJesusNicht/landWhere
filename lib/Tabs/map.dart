@@ -15,6 +15,8 @@ class MapScreen extends StatefulWidget {
 class MapSampleState extends State<MapScreen> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+  List<Marker> customMarkers = [] ;
+
 
   TextEditingController _searchController = TextEditingController();
 
@@ -35,6 +37,7 @@ class MapSampleState extends State<MapScreen> {
       body: Column(
         children: [
           Row(
+
             children: [
               Expanded(child: TextFormField(
                 controller: _searchController,
@@ -52,10 +55,13 @@ class MapSampleState extends State<MapScreen> {
           Expanded(
             child: GoogleMap(
               mapType: MapType.hybrid,
+              //markers: Set<Marker>.of(markers.values),
               initialCameraPosition: _kGooglePlex,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
+              markers: Set.from(customMarkers),
+              onTap: _setCustomMarker,
             ),
           ),
         ],
@@ -72,4 +78,20 @@ class MapSampleState extends State<MapScreen> {
       CameraPosition(target: LatLng(lat, lng), zoom: 12),
     ));
   }
+
+   _setCustomMarker(LatLng tappedPoint){
+    setState(() {
+      customMarkers =[];
+      customMarkers.add(Marker(
+            markerId: MarkerId(tappedPoint.toString()),
+            position: tappedPoint,
+        infoWindow: InfoWindow(
+            title: 'Schwanz',
+
+
+        ),
+      ));
+
+    });
+   }
 }
