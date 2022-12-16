@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -25,11 +27,21 @@ class MapSampleState extends State<MapScreen> {
     zoom: 14.4746,
   );
 
+  MapType _currentMapType = MapType.normal;
+
   static const CameraPosition _kLake = CameraPosition(
       bearing: 192.8334901395799,
       target: LatLng(37.43296265331129, -122.08832357078792),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
+
+ /* void _changeMapType(){
+    setState(() {
+      _currentMapType = _currentMapType == MapType.normal
+          ? MapType.satellite
+          : MapType.normal;
+    });
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +64,19 @@ class MapSampleState extends State<MapScreen> {
               ),
             ],
           ),
+/*          Container(
+            padding: const EdgeInsets.only(top: 24, right: 12),
+            alignment: Alignment.topRight,
+            child: Column(
+              children: <Widget>[
+                FloatingActionButton(
+                  onPressed: _changeMapType,
+                  backgroundColor: Colors.green,
+                  child: Icon(Icons.map, size: 30.0,),
+                )
+              ],
+            ),
+          ),*/
           Expanded(
             child: GoogleMap(
               mapType: MapType.hybrid,
