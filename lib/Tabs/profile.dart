@@ -84,66 +84,7 @@ class _ProfileState extends State<Profile> {
 
         });
   }
-  /*Future<void> _update([DocumentSnapshot? documentSnapshot]) async {
-    if (documentSnapshot != null) {
 
-      _nameController.text = documentSnapshot['Bezeichnung'];
-      _latitudeController.text = documentSnapshot['Position'].toString();
-
-    }
-
-    await showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (BuildContext ctx) {
-          return Padding(
-            padding: EdgeInsets.only(
-                top: 20,
-                left: 20,
-                right: 20,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Bezeichnung'),
-                ),
-                TextField(
-                  keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-                  controller: _latitudeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Position',
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  child: const Text( 'Update'),
-                  onPressed: () async {
-                    final String name = _nameController.text;
-                    final double? price =
-                    double.tryParse(_latitudeController.text);
-                    if (price != null) {
-
-                      await _markers
-                          .doc(documentSnapshot!.id)
-                          .update({"name": name, "price": price});
-                      _nameController.text = '';
-                      _latitudeController.text = '';
-                      Navigator.of(context).pop();
-                    }
-                  },
-                )
-              ],
-            ),
-          );
-        });
-  }
-*/
   Future<void> _delete(String productId) async {
     await _markers.doc(productId).delete();
 
