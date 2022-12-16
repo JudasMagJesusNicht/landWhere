@@ -80,7 +80,7 @@ class MapSampleState extends State<MapScreen> {
     );
   }
 
-  Stream<List<CustomMarker>> readCustomMarkers() => FirebaseFirestore.instance.collection('mapcoords').snapshots().map((snapshot) => snapshot.docs.map((doc) => CustomMarker.fromJson(doc.data())));
+  //Stream<List<CustomMarker>> readCustomMarkers() => FirebaseFirestore.instance.collection('mapcoords').snapshots().map((snapshot) => snapshot.docs.map((doc) => CustomMarker.fromJson(doc.data())));
 
   Future<void> _goToPlace(Map<String, dynamic> place) async {
     final double lat = place['geometry']['location']['lat'];
