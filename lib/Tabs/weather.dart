@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -19,11 +18,13 @@ class Weather extends StatefulWidget {
 class _WeatherState extends State<Weather> {
   final String title = 'Weather';
 
+  // User input City to grab API data from
   final _cityTextController = TextEditingController();
 
 
-
+  // Necessary variables
   var cityName;
+  var name;
   var lat;
   var lon;
   var temp;
@@ -31,16 +32,19 @@ class _WeatherState extends State<Weather> {
   var currently;
   var humidity;
   var windSpeed;
+  var airPressure;
+
+  var currentPosition;
 
 
 
 
-
+  // Method that teste if location services are enabled. If not it opens window on phone
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Test if location services are enabled.
+
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
@@ -62,10 +66,22 @@ class _WeatherState extends State<Weather> {
     return await Geolocator.getCurrentPosition();
   }
 
-  @override
-  void initState() {
-    super.initState();
+ void _getCurrentPosition() async{
+   Position? position = await Geolocator.getLastKnownPosition();
+   print(position);
+   setState(() {
+     currentPosition = position;
+     lat = position?.latitude.toString();
+     lon = position?.longitude.toString();
+   });
   }
+  @override
+  void initState(){
+    super.initState();
+    _getCurrentPosition();
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +92,7 @@ class _WeatherState extends State<Weather> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Bar on Top to decide how to grab API data
               Column(children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -110,10 +127,7 @@ class _WeatherState extends State<Weather> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        _determinePosition().then((value){
-                          lat ='$value.latitude';
-                          lon ='$value.longitude';
-                        });
+                        _getCurrentPosition();
                         getWeatherByCoordinates(lat,lon);
                       },
                       style: ElevatedButton.styleFrom(
@@ -122,6 +136,14 @@ class _WeatherState extends State<Weather> {
                       child: const Icon(Icons.location_searching),
                     ),
                   ],
+                ),Container(
+                  margin: EdgeInsets.all(30),
+                  child: Text(
+                    name != null ? name.toString()  : 'Loading',
+                    style: GoogleFonts.rubikMonoOne(
+                        color: Colors.black, fontSize: 50),
+                        textAlign: TextAlign.center,
+                  ),
                 ),
                 Container(
                   margin: EdgeInsets.all(30),
@@ -142,6 +164,7 @@ class _WeatherState extends State<Weather> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(15.0),
+              //ListView displaying certain weather infos to the screen
               child: ListView(
                 children: <Widget>[
                   ListTile(
@@ -150,11 +173,11 @@ class _WeatherState extends State<Weather> {
                       color: Colors.black45,
                     ),
                     title: Text(
-                      'Temperature',
-                      style: GoogleFonts.rubikMonoOne(color: Colors.black45),
+                      'Luftdruck',
+                      style: GoogleFonts.rubikMonoOne(color: Colors.black45, fontSize: 12),
                     ),
                     trailing: Text(
-                      temp != null ? temp.toString() + "\u00B0" : 'Loading',
+                      airPressure != null ? airPressure.toString() + 'hPa'  : 'Loading',
                       style: GoogleFonts.rubikMonoOne(color: Colors.black45),
                     ),
                   ),
@@ -164,8 +187,8 @@ class _WeatherState extends State<Weather> {
                       color: Colors.black45,
                     ),
                     title: Text(
-                      'Humidity',
-                      style: GoogleFonts.rubikMonoOne(color: Colors.black45),
+                      'Luftfeuchtigkeit',
+                      style: GoogleFonts.rubikMonoOne(color: Colors.black45, fontSize: 12),
                     ),
                     trailing: Text(
                       humidity != null ? humidity.toString() + '%' : 'Loading',
@@ -177,8 +200,8 @@ class _WeatherState extends State<Weather> {
                       color: Colors.black45,
                     ),
                     title: Text(
-                      'Wind Speed',
-                      style: GoogleFonts.rubikMonoOne(color: Colors.black45),
+                      'Wind Geschwindigkeit',
+                      style: GoogleFonts.rubikMonoOne(color: Colors.black45, fontSize: 12),
                     ),
                     trailing: Text(
                       windSpeed != null ? windSpeed.toString()   : 'Loading',
@@ -193,8 +216,10 @@ class _WeatherState extends State<Weather> {
       ),
     );
   }
-
+  // Method that uses user input to load OpenWeatherMap API data
   Future getWeatherByCity(String cityName) async {
+
+
     final queryParameters = {
       'q': cityName,
       'appid': '54a4320f0228f237495a6df9e9d1cac1',
@@ -206,15 +231,19 @@ class _WeatherState extends State<Weather> {
     http.Response response = await http.get(uri);
     var results = jsonDecode(response.body);
     setState(() {
+      this.name = results['name'];
       this.temp = results['main']['temp'];
       this.description = results['weather'][0]['description'];
       this.currently = results['weather'][0]['main'];
       this.humidity = results['main']['humidity'];
       this.windSpeed = results['wind']['speed'];
+      this.airPressure = results['main']['pressure'];
+
     });
   }
+  // Method that uses user coordinates to load OpenWeatherMap API data
+  Future getWeatherByCoordinates(String lat, String lon) async {
 
-  Future getWeatherByCoordinates(double lat, double lon) async {
     final queryParameters = {
       'lat': lat,
       'lon': lon,
@@ -227,11 +256,13 @@ class _WeatherState extends State<Weather> {
     http.Response response = await http.get(uri);
     var results = jsonDecode(response.body);
     setState(() {
+      this.name = results['name'];
       this.temp = results['main']['temp'];
       this.description = results['weather'][0]['description'];
       this.currently = results['weather'][0]['main'];
       this.humidity = results['main']['humidity'];
       this.windSpeed = results['wind']['speed'];
+      this.airPressure = results['main']['pressure'];
     });
   }
 

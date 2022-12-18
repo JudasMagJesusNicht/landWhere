@@ -23,6 +23,14 @@ class _LoggedInScreenState extends State<LoggedInScreen> {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Container(
+                width: 130,
+                height: 130,
+                child: Image(image: AssetImage('./assets/landWhereLogoFull.png')),
+            ),
+            SizedBox(
+              height: 30,
+            ),
             Text(
               'Eingeloggt als:',
               style: GoogleFonts.rubikMonoOne(color: Colors.black),
@@ -32,7 +40,7 @@ class _LoggedInScreenState extends State<LoggedInScreen> {
               style: GoogleFonts.rubikMonoOne(color: Colors.black),
             ),
             SizedBox(
-              height: 200,
+              height: 30,
             ),
             ElevatedButton(
               onPressed: () {

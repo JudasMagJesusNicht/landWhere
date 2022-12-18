@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
             tabs: [
               Tab(icon: Icon(Icons.sunny_snowing)),
               Tab(icon: Icon(Icons.map_outlined)),
-              Tab(icon: Icon(Icons.person)),
+              Tab(icon: Icon(Icons.location_on_outlined)),
             ],
             isScrollable: false,
           ),

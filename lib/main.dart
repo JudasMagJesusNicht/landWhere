@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:helikopterhelp/authscreen.dart';
 import 'screens.dart';
 
+
+// Main Method initializing FireBase and clearing ImageCache
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -29,7 +31,6 @@ class MyApp extends StatelessWidget {
       routes: {
           '/home' : (context) => HomeScreen(),
           '/login' : (context) => AuthScreen(),
-          '/listview' : (context) => ListScreen(),
           '/logcheck' : (context) => LoggedScreen(),
           '/loggedin' : (context) => LoggedInScreen(),
       },

@@ -19,12 +19,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // Method to give input login data to firebase
   Future signIn() async{
     await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim());
   }
 
+  // Method to dispose Textcontrollers
   @override
   void dispose(){
     _emailController.dispose();

@@ -13,6 +13,7 @@ class _AuthScreenState extends State<AuthScreen> {
   //Zeige LoginPage
   bool showLoginPage = true;
 
+  // Method to switch between Login Screen and Register Screen
   void toggleScreens(){
     setState(() {
       showLoginPage = !showLoginPage;

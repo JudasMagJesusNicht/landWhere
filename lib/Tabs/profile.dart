@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.title});
@@ -89,14 +90,25 @@ class _ProfileState extends State<Profile> {
     await _markers.doc(productId).delete();
 
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('You have successfully deleted a product')));
+        content: Text('You have successfully deleted a marker')));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Center(child: Text('Landeplätze')),
+          automaticallyImplyLeading: false,
+          title:  Center(
+            child: Text(
+                'Landeplätze',
+                style: TextStyle(
+                  color: Colors.deepOrangeAccent,
+                  
+                ),
+
+
+            ),
+          ),
         ),
         body: StreamBuilder(
           stream: _markers.snapshots(),
@@ -139,8 +151,9 @@ class _ProfileState extends State<Profile> {
             );
           },
         ),
-// Add new product
+// Add new point
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.deepOrangeAccent,
           onPressed: () => _create(),
           child: const Icon(Icons.add),
 

@@ -19,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  // Method to pass new user to FireBase
   Future signUp() async{
     if(passwordConfirmed()){
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -27,6 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // Method comparing both password inputs
   bool passwordConfirmed(){
     if(_passwordController.text.trim() == _confirmPasswordController.text.trim()){
       return true;
@@ -34,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return false;
     }
   }
-
+// Method to dispose Textcontrollers
   @override
   void dispose(){
     _emailController.dispose();

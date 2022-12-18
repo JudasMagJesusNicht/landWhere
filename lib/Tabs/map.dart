@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../API/locationService.dart';
@@ -24,6 +25,8 @@ class MapSampleState extends State<MapScreen> {
   var markerTitle;
   var markerSnippet;
 
+
+
   final CollectionReference _mapcoords = FirebaseFirestore.instance.collection('mapcoords');
   final Stream<QuerySnapshot> savedMarkers = FirebaseFirestore.instance.collection('mapcoords').snapshots();
 
@@ -33,11 +36,9 @@ class MapSampleState extends State<MapScreen> {
   TextEditingController _markerSnippetController = TextEditingController();
 
   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
+    target: LatLng(54.3232927, 10.1227652),
     zoom: 14.4746,
   );
-
-
 
 
 
@@ -47,18 +48,39 @@ class MapSampleState extends State<MapScreen> {
       body: Column(
         children: [
           Row(
-
             children: [
-              Expanded(child: TextFormField(
-                controller: _searchController,
-                textCapitalization: TextCapitalization.words,
+              Expanded(child: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: TextFormField(
+                  controller: _searchController,
+                  textCapitalization: TextCapitalization.words,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black45,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                  ),
+                ),
               )),
               IconButton(
                 onPressed: () async {
                   var place = await LocationService().getPlace(_searchController.text);
-                  _goToPlace(place);
+                  _goToPlaceByCity(place);
+
                 },
-                icon: Icon(Icons.search),
+                icon: Icon(
+                    Icons.search,
+                    color: Colors.black45,
+                ),
+              ),
+              IconButton(
+                onPressed: () async {
+                  _goToPlaceByCoords();
+                },
+                icon: Icon(
+                  Icons.location_searching_sharp,
+                  color: Colors.black45,
+                ),
               ),
             ],
           ),
@@ -70,19 +92,22 @@ class MapSampleState extends State<MapScreen> {
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
+
               markers: Set.from(customMarkers),
               onLongPress: _setCustomMarker,
 
             ),
+
           ),
+
         ],
       ),
     );
   }
 
-  //Stream<List<CustomMarker>> readCustomMarkers() => FirebaseFirestore.instance.collection('mapcoords').snapshots().map((snapshot) => snapshot.docs.map((doc) => CustomMarker.fromJson(doc.data())));
 
-  Future<void> _goToPlace(Map<String, dynamic> place) async {
+  // Method that moves camera to desired position
+  Future<void> _goToPlaceByCity(Map<String, dynamic> place) async {
     final double lat = place['geometry']['location']['lat'];
     final double lng = place['geometry']['location']['lng'];
 
@@ -92,15 +117,28 @@ class MapSampleState extends State<MapScreen> {
     ));
   }
 
-   _setCustomMarker(LatLng tappedPoint){
+  Future<void> _goToPlaceByCoords() async {
+    Position? position = await Geolocator.getLastKnownPosition();
+    final double? lat = position?.latitude;
+    final double? lng = position?.longitude;
 
+    print(lat.toString()+lng.toString());
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: LatLng(lat!, lng!), zoom: 12),
+    ));
+  }
+
+    // Method to set a custom Marker on tapped point including a marker name
+   _setCustomMarker(LatLng tappedPoint){
     openDialog();
     setState(() {
       //customMarkers =[];
       markerPosition = tappedPoint;
       markerLat = tappedPoint.latitude;
       markerLng = tappedPoint.longitude;
-      markerTitle= _markerTitleController.text.toString()!;
+
       markerSnippet = _markerSnippetController.text.toString();
       customMarkers.add(Marker(
             markerId: MarkerId(tappedPoint.toString()),
@@ -115,11 +153,14 @@ class MapSampleState extends State<MapScreen> {
     }
     );
    }
-   Future openDialog() => showDialog(
+
+   // Method to open the dialog for entering a name for point
+   Future openDialog() async => showDialog(
+
        context: context,
        builder: (context) => AlertDialog(
          title: Text('Speichere einen Landeplatz'),
-         content: TextField(
+         content: TextFormField(
            controller: _markerTitleController,
            decoration: InputDecoration(
              hintText: 'Name des Landeplatzes',
@@ -131,15 +172,21 @@ class MapSampleState extends State<MapScreen> {
              onPressed: submit,
            )
          ],
+       )
+   );
 
-       ));
 
+  // Method to close PopUp and create CustomMarker
   void submit(){
     Navigator.of(context).pop();
+    setState(() {
+      markerTitle= _markerTitleController.text.toString()!;
+    });
     print(markerTitle);
-    //createCustomMarker();
+    createCustomMarker();
   }
 
+  //upload CustomMarker to FireStore
   Future createCustomMarker() async{
     final customMarker = FirebaseFirestore.instance.collection('mapcoords').doc();
 
@@ -150,4 +197,5 @@ class MapSampleState extends State<MapScreen> {
 
     await customMarker.set(json);
   }
+
 }
